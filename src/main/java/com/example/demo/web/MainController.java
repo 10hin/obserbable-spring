@@ -4,9 +4,7 @@ import io.micrometer.tracing.Tracer;
 import lombok.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,14 +34,16 @@ public class MainController {
         this.tracer = tracer;
     }
 
-    @GetMapping
+    @GetMapping(consumes = {MediaType.ALL_VALUE})
     public Mono<ResponseEntity<Void>> index(
             @RequestHeader(name = "FAILS", required = false, defaultValue = "false")
-            final boolean fails
+            final boolean fails,
+            @RequestHeader final HttpHeaders headers
     ) {
 
         LOGGER.info("MainController.index() called");
         LOGGER.debug("FAILS header value: {}", fails);
+        LOGGER.debug("headers: {}", headers);
         try {
             if (fails) {
                 throw new NullPointerException("dummy: someVariable is null");
